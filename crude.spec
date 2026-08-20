@@ -27,8 +27,10 @@ crude-skal (Skal Australia member portal), crude-rezdy (Rezdy products,
 availability, and bookings), crude-deputy (Deputy workforce management),
 crude-sonas (Sonas wedding-venue software), crude-xero (Xero accounting),
 crude-airwallex (Airwallex global payments and transactions), crude-clover
-(Clover POS orders and catalog), and crude-facebook (Facebook Pages:
-posts, insights, comments). The crude command
+(Clover POS orders and catalog), crude-facebook (Facebook Pages:
+posts, insights, comments), and crude-mautic (a self-hosted Mautic
+instance: marketing forms, submissions, contacts, campaigns).
+The crude command
 lists them and carries the shared --version and install-claude-command flags.
 
 %prep
@@ -61,7 +63,8 @@ for spec in \
     crude-xero:crude_xero.cli \
     crude-airwallex:crude_airwallex.cli \
     crude-clover:crude_clover.cli \
-    crude-facebook:crude_facebook.cli; do
+    crude-facebook:crude_facebook.cli \
+    crude-mautic:crude_mautic.cli; do
     name=${spec%%:*}
     module=${spec##*:}
     cat > %{buildroot}/usr/bin/${name} << ENTRY
@@ -85,6 +88,7 @@ done
 /usr/bin/crude-airwallex
 /usr/bin/crude-clover
 /usr/bin/crude-facebook
+/usr/bin/crude-mautic
 /usr/lib/python*/site-packages/crude_*/
 /usr/lib/python*/site-packages/crude-*.dist-info/
 
