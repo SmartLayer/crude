@@ -1,7 +1,7 @@
 """The crude umbrella command: an index of the per-site CLIs.
 
 crude has no resources of its own. Run with no arguments it lists the site
-commands (crude-atdw, crude-skal, crude-rezdy, crude-deputy, crude-sonas, crude-xero, crude-airwallex, crude-clover, crude-facebook) and the shared flags;
+commands (crude-atdw, crude-skal, crude-rezdy, crude-deputy, crude-sonas, crude-xero, crude-airwallex, crude-clover, crude-facebook, crude-mautic) and the shared flags;
 each site is a binary driven directly. It carries the same --version, --help, and
 install-claude-command surface as the site CLIs.
 """
@@ -19,7 +19,7 @@ from crude_common.claude_command import (
 )
 
 app = typer.Typer(
-    help="crude — index of the per-site CLIs (crude-atdw, crude-skal, crude-rezdy, crude-deputy, crude-sonas, crude-xero, crude-airwallex, crude-clover, crude-facebook).",
+    help="crude — index of the per-site CLIs (crude-atdw, crude-skal, crude-rezdy, crude-deputy, crude-sonas, crude-xero, crude-airwallex, crude-clover, crude-facebook, crude-mautic).",
 )
 
 # (binary, one-line description) for the no-argument listing. This is the index
@@ -35,6 +35,7 @@ SITES = [
     ("crude-airwallex", "Airwallex global payments and transactions (airwallex.com)"),
     ("crude-clover", "Clover POS orders, catalog, and Square-shape export (clover.com)"),
     ("crude-facebook", "Facebook Pages — posts, insights, comments (graph.facebook.com)"),
+    ("crude-mautic", "Mautic forms, submissions, contacts, campaigns (self-hosted)"),
 ]
 
 

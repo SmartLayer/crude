@@ -51,6 +51,13 @@ page_id = "..."        # the Facebook Page id
 # Page writes need a Page access token. For a Page managed in Business Manager, use a System
 # User token with the Page assigned and set page_id; see docs/facebook.md for the steps.
 
+[mautic]
+base_url = "https://mautic.example.com"   # your Mautic instance, no /api suffix
+username = "your-mautic-username"
+password = "your-mautic-password"
+# Basic auth is off by default: switch on both the API and "Enable HTTP basic auth"
+# under Configuration > API Settings in Mautic, as the user whose credentials these are.
+
 # Multiple accounts on one site
 # -----------------------------
 # The bare [site] section above is the "default" account. Hold a second account on
