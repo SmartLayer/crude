@@ -55,8 +55,9 @@ page_id = "..."        # the Facebook Page id
 base_url = "https://mautic.example.com"   # your Mautic instance, no /api suffix
 username = "your-mautic-username"
 password = "your-mautic-password"
-# Basic auth is off by default: switch on both the API and "Enable HTTP basic auth"
-# under Configuration > API Settings in Mautic, as the user whose credentials these are.
+# Mautic ships with both switches off. In the Mautic admin UI, under Configuration >
+# API Settings, turn on the API and then "Enable HTTP basic auth"; the second setting
+# only appears once the first is on.
 
 # Multiple accounts on one site
 # -----------------------------

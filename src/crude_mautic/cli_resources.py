@@ -32,11 +32,6 @@ from crude_mautic.client import MauticError, rows, unescape_results
 _JSON = typer.Option(False, "--json", help="Print the raw JSON of the result.")
 _LIMIT = typer.Option(25, "--limit", help="Maximum records to fetch.")
 
-# Result columns that are not answers to form fields; listed so a submission's own
-# answers can be discovered by subtracting them.
-_SUBMISSION_META = ["id", "ipAddress", "form", "lead", "trackingId", "dateSubmitted",
-                    "referer", "page", "results"]
-
 _FORM_COLS = [
     ("ID", "id"), ("Alias", "alias"), ("Name", "name"),
     ("Published", "isPublished"), ("Added", "dateAdded"),
