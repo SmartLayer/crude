@@ -28,3 +28,14 @@ def crude_config() -> dict:
     except (typer.Exit, SystemExit):
         pytest.skip("no crude config.toml found")
     return read_config(path)
+
+
+@pytest.fixture(autouse=True)
+def _claude_config_dir_sandbox(tmp_path_factory, monkeypatch):
+    """Point ``CLAUDE_CONFIG_DIR`` at a scratch tree for every test.
+
+    Each site CLI rewrites its Claude Code command on every invocation, so a
+    ``CliRunner`` call from the suite would otherwise reach the developer's live
+    configuration and rewrite the command file there.
+    """
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path_factory.mktemp("claude")))
