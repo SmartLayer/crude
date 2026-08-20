@@ -1,5 +1,5 @@
 Name:           crude
-Version:        1.4.3
+Version:        1.5.0
 Release:        1%{?dist}
 Summary:        CRUD-style command-line clients for sites without a public API
 License:        MIT
@@ -93,7 +93,14 @@ done
 /usr/lib/python*/site-packages/crude-*.dist-info/
 
 %changelog
-* Wed Jul 22 2026 Weiwu Zhang <a@colourful.land> - 1.4.3-1
+* Thu Aug 20 2026 Weiwu Zhang <a@colourful.land> - 1.5.0-1
+- crude-sonas: `event leads` counts enquiries by lead source and enquiry date.
+- crude-mautic: a Mautic backend for forms, submissions, contacts, segments and
+  campaigns, shipped in the .deb and the .rpm.
+- The Claude Code command installs into the configuration directory the session
+  actually reads: $CLAUDE_CONFIG_DIR when it is set, ~/.claude otherwise. A
+  machine with several configuration trees no longer takes the install in one
+  and leaves the others without it.
 - crude-xero: PKCE auth for Mobile-or-desktop Xero apps (client_id only);
   a config client_secret selects the confidential Web-app flow instead.
 - crude-xero: default consent uses Xero's granular scopes, the only kind
