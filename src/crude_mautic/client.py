@@ -117,7 +117,9 @@ class MauticSession(HttpSession):
                     return
             total = payload.get("total")
             start += len(page)
-            if not page or (total is not None and start >= int(total)):
+            # A short page is the last one; the total is the stop for endpoints
+            # that report it, and some (users/self among them) do not.
+            if len(page) < PAGE or (total is not None and start >= int(total)):
                 return
 
     def fetch(self, path, entity, *, params=None, limit=None, created=None,

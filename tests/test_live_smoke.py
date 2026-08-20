@@ -535,3 +535,79 @@ def test_facebook_write_roundtrip(crude_config):
         _fb_json(["post", "edit", pid, "-m", "crude-facebook self-test edited, ignore", "--yes"])
     finally:
         _fb_json(["post", "delete", pid, "--yes"])
+
+
+# ---------------------------------------------------------------------------
+# crude-mautic (a self-hosted Mautic instance)
+#
+# The client reads only, so these are reads alone. They drive the real CLI
+# commands through a CliRunner, and skip when [mautic] credentials are absent.
+# Mautic ships with both the API and HTTP basic auth switched off, so a failure
+# here on a configured instance most often means one of those two switches, which
+# is precisely the rot worth catching.
+# ---------------------------------------------------------------------------
+
+_mautic_runner = _CliRunner()
+
+
+def _mautic_or_skip(crude_config):
+    if not crude_config.get("mautic", {}).get("password"):
+        pytest.skip("no [mautic] credentials in config")
+
+
+def _mautic_json(args):
+    """Invoke a crude-mautic command with --json; fail (not skip) on a non-zero exit."""
+    from crude_mautic.cli import app
+
+    r = _mautic_runner.invoke(app, args + ["--json"])
+    assert r.exit_code == 0, f"{' '.join(args)} -> exit {r.exit_code}\n{r.output}"
+    return _json.loads(r.output)
+
+
+@pytest.mark.live
+def test_mautic_credentials_reach_the_instance(crude_config):
+    _mautic_or_skip(crude_config)
+    me = _mautic_json(["status"])
+    assert me["username"]
+    assert me["instance"].startswith("http")
+
+
+@pytest.mark.live
+def test_mautic_lists_forms(crude_config):
+    _mautic_or_skip(crude_config)
+    forms = _mautic_json(["form", "list"])
+    assert isinstance(forms, list)
+    if forms:
+        assert forms[0]["alias"]
+
+
+@pytest.mark.live
+def test_mautic_reads_submissions_of_the_first_form(crude_config):
+    """The submissions endpoint answers, and every row carries its answers map."""
+    _mautic_or_skip(crude_config)
+    forms = _mautic_json(["form", "list"])
+    if not forms:
+        pytest.skip("instance has no forms")
+    subs = _mautic_json(["form", "submissions", forms[0]["alias"], "--limit", "5"])
+    assert isinstance(subs, list)
+    for s in subs:
+        assert isinstance(s.get("results"), dict)
+
+
+@pytest.mark.live
+def test_mautic_lists_one_contact(crude_config):
+    _mautic_or_skip(crude_config)
+    contacts = _mautic_json(["contact", "list", "--limit", "1"])
+    assert isinstance(contacts, list)
+    if contacts:
+        assert contacts[0]["id"]
+
+
+@pytest.mark.live
+def test_mautic_lists_segments_under_their_older_name(crude_config):
+    """Segments answer under `lists`; a bare list here proves the key mapping holds."""
+    _mautic_or_skip(crude_config)
+    segments = _mautic_json(["segment", "list"])
+    assert isinstance(segments, list)
+    if segments:
+        assert segments[0]["alias"]
