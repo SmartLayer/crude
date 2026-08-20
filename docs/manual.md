@@ -186,6 +186,7 @@ body is best-effort current state, disclosed as such. The per-backend boundary
 | Xero | accounting `where UpdatedDateUTC<=`; journals exact; report date params | projects/payroll etc. where stamps exist | reports (computed-now); stamp-less lists | PDF / attachment of a post-cutoff record |
 | Sonas | — (DDP) | `createdAt`-family per collection; export bundles | event doc bodies | — |
 | Facebook | posts `until` | posts, comments by `created_time` | `page get` | insights, scheduled posts |
+| Mautic | — | every list, by `dateAdded` (submissions by `dateSubmitted`) | `email` reads (send counts); `dateModified`>bound | — |
 | ATDW | — | — | listings; `updatedOn`>bound | — |
 | Skål | Odoo domain `create_date<=` | — | `write_date`>bound | — |
 | all | — | — | — | **every write verb** |
@@ -199,7 +200,11 @@ honest and a silently newer body is not; journals (append-only,
 `CreatedDateUTC`) are the one exact surface, and reports are still computed
 from today's ledger over the clamped period, disclosed as such. ATDW is the
 weakest boundary in the tool: listings expose no creation date at all, so they
-are served as-is with only the `updatedOn` flag. Pre-parsed outputs respect the
+are served as-is with only the `updatedOn` flag. Mautic offers no creation-time
+filter of its own, so the whole set is walked and trimmed here; a form
+submission is written once and never revised, which is why it is bounded on
+`dateSubmitted` alone with no mutation flag. A contact's `points` is a running
+total like the email counters, and is not flagged separately. Pre-parsed outputs respect the
 bound too: `crude-sonas event export` writes a corpus containing nothing
 created after the cutoff (its `index.json` carries the cutoff and drop
 counts), and `crude-clover flatten` drops post-cutoff orders even from a JSONL

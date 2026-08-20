@@ -17,6 +17,7 @@ The clients ship as their own console binaries:
 - `crude-airwallex`: Airwallex global payments and transactions, balances, payouts, and payment acceptance (REST, API-key bearer token).
 - `crude-clover`: AP Clover POS orders, catalog, and Square-shape CSV export (REST, static bearer token).
 - `crude-facebook`: Facebook Page posts, insights, and comments over the Graph API (REST, Page or System User token).
+- `crude-mautic`: a self-hosted Mautic instance: website forms and their submissions, contacts, segments, campaigns (REST, HTTP basic auth).
 
 Running `crude` with no arguments lists these commands. `--version`, `--help`, and `install-claude-command` work on `crude` and on every site binary.
 
@@ -51,11 +52,11 @@ From source with pip:
 pip install -e .
 ```
 
-Any of these put `crude` and the site binaries (`crude-atdw`, `crude-skal`, `crude-rezdy`, `crude-deputy`, `crude-sonas`, `crude-xero`, `crude-airwallex`, `crude-clover`, `crude-facebook`) on your PATH. During development you can also run them without installing, from the `src/` directory, as `python3 -m crude_atdw <command>` (likewise `crude_skal`, `crude_rezdy`, `crude_deputy`, `crude_sonas`, `crude_xero`, `crude_airwallex`, `crude_clover`, `crude_facebook`, and `crude_common.launcher` for the `crude` index).
+Any of these put `crude` and the site binaries (`crude-atdw`, `crude-skal`, `crude-rezdy`, `crude-deputy`, `crude-sonas`, `crude-xero`, `crude-airwallex`, `crude-clover`, `crude-facebook`, `crude-mautic`) on your PATH. During development you can also run them without installing, from the `src/` directory, as `python3 -m crude_atdw <command>` (likewise `crude_skal`, `crude_rezdy`, `crude_deputy`, `crude_sonas`, `crude_xero`, `crude_airwallex`, `crude_clover`, `crude_facebook`, `crude_mautic`, and `crude_common.launcher` for the `crude` index).
 
 ### Claude Code command
 
-The CLIs install a Claude Code command at `~/.claude/commands/crude.md` (covering every site) and keep it current automatically: every run rewrites the file when it is missing or differs from the bundled version. Run `crude-atdw install-claude-command` (or `crude-skal`, `crude-rezdy`, `crude-deputy`, `crude-sonas`, `crude-xero`, `crude-airwallex`, `crude-clover`, `crude-facebook`) to write it explicitly. A same-named skill, if you keep one, takes precedence and the command is left alone.
+The CLIs install a Claude Code command at `~/.claude/commands/crude.md` (covering every site) and keep it current automatically: every run rewrites the file when it is missing or differs from the bundled version. Run `crude-atdw install-claude-command` (or `crude-skal`, `crude-rezdy`, `crude-deputy`, `crude-sonas`, `crude-xero`, `crude-airwallex`, `crude-clover`, `crude-facebook`, `crude-mautic`) to write it explicitly. A same-named skill, if you keep one, takes precedence and the command is left alone.
 
 ## Dependencies
 
@@ -175,6 +176,22 @@ crude-airwallex pa payment-intent list
 ```
 
 The command groups are the treasury reads (`account`, `balance`, `transaction`), Payouts (`beneficiary`, `transfer`, `fx-rate`, `conversion`), and Payments Acceptance (the `pa` group). Reads accept `--json`. Verbs that move money (`transfer create`, `conversion create`, `pa payment-intent create`, `pa refund create`, and the like) prompt for confirmation unless you pass `--yes`. Some products need separate enablement on your Airwallex account; a call to one that is not enabled reports that plainly rather than failing obscurely. The full command surface and the verified API specifics are in `docs/airwallex.md`.
+
+## Mautic usage (`crude-mautic`)
+
+Mautic authenticates with a username and password sent as HTTP basic auth, set in the `[mautic]` section along with `base_url` (your instance, with no `/api` suffix); there is no login step. Mautic ships with both switches off, so turn on the API and HTTP basic auth under Configuration > API Settings before the first call. `crude-mautic status` confirms the credentials and names the signed-in user.
+
+```
+crude-mautic form list
+crude-mautic form get website_en
+crude-mautic form submissions website_en --group-by topic
+crude-mautic form submissions website_en --where topic="Stallholder EOI"
+crude-mautic contact list --search someone@example.com
+crude-mautic segment list
+crude-mautic email list
+```
+
+A form is addressed by its numeric id or by the alias its page markup carries. One Mautic form often serves several website pages, each marking its own traffic with a hidden field, so counting one page's submissions means filtering a shared form rather than reading a form of its own: `--group-by topic` counts every page's slice at once, and `--where topic=...` narrows to one. Submitted answers are HTML-unescaped before matching or grouping, so an answer stored two ways (`NDIS &amp; Disability` beside `NDIS & Disability`) counts once. `--field` picks which answer columns the table shows. Contacts take Mautic's own `--search` syntax, an email address or `segment:alias`. The client reads; it does not create or edit Mautic records.
 
 ## Further reference
 

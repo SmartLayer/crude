@@ -317,6 +317,9 @@ def email_list(limit: int = _LIMIT, output_json: bool = _JSON):
                            modified="dateModified", what="email")
     except MauticError as e:
         _fail("emails", e)
+    # The send and read counts are running totals with no as-of form: an email
+    # that existed before the cutoff still reports what it has sent by now.
+    items = asof.current_state(items, "email send and read counts (running totals)")
     emit_list(items, _EMAIL_COLS, "email", output_json)
 
 
@@ -330,4 +333,6 @@ def email_get(
         rec = sess.one(f"/emails/{email_id}", "email")
     except MauticError as e:
         _fail(f"email {email_id}", e)
-    emit_record(asof.check_record(rec, "dateAdded", "dateModified", what="email"), output_json)
+    rec = asof.check_record(rec, "dateAdded", "dateModified", what="email")
+    rec = asof.current_state(rec, "email send and read counts (running totals)")
+    emit_record(rec, output_json)

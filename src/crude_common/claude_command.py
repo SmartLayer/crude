@@ -36,13 +36,13 @@ ACCOUNT_HELP = (
 # sites come up; how to drive the CLIs is the body below, not the description.
 COMMAND = """---
 name: crude
-description: Read and edit your own data on atdw-online.com.au (ATDW tourism listings), australia.skal.org (Skal Australia member portal), rezdy.com (products, availability, bookings), deputy.com (rostering, timesheets, leave, employees), app.sonas.events (Sonas wedding-venue events), xero.com (Xero accounting), airwallex.com (Airwallex payments and transactions), clover.com (Clover POS orders and catalog), and graph.facebook.com (Facebook Pages: posts, insights, comments).
+description: Read and edit your own data on atdw-online.com.au (ATDW tourism listings), australia.skal.org (Skal Australia member portal), rezdy.com (products, availability, bookings), deputy.com (rostering, timesheets, leave, employees), app.sonas.events (Sonas wedding-venue events), xero.com (Xero accounting), airwallex.com (Airwallex payments and transactions), clover.com (Clover POS orders and catalog), graph.facebook.com (Facebook Pages: posts, insights, comments), and a self-hosted Mautic instance (marketing forms and who submitted them, contacts, segments, campaigns, email send counts).
 allowed-tools: Bash
 ---
 
 # crude
 
-crude provides command-line clients for reading and editing your own data on a handful of sites, each through one `crude-<site> <resource> <verb>` grammar. Some sites lack a usable public API and are reached through their internal endpoints; others ride a documented one. Each site is its own binary. Configuration for all of them lives in `~/.config/crude/config.toml` (sections `[atdw]`, `[skal]`, `[rezdy]`, `[deputy]`, `[sonas]`, `[xero]`, `[airwallex]`, `[clover]`, `[facebook]`). Add `--json` to any read command for machine-readable output.
+crude provides command-line clients for reading and editing your own data on a handful of sites, each through one `crude-<site> <resource> <verb>` grammar. Some sites lack a usable public API and are reached through their internal endpoints; others ride a documented one. Each site is its own binary. Configuration for all of them lives in `~/.config/crude/config.toml` (sections `[atdw]`, `[skal]`, `[rezdy]`, `[deputy]`, `[sonas]`, `[xero]`, `[airwallex]`, `[clover]`, `[facebook]`, `[mautic]`). Add `--json` to any read command for machine-readable output.
 
 A site can hold several accounts. The bare `[site]` section is the default account; a `[site.<name>]` subtable is a named one. Select it with `--account/-a <name>` before the resource (or `$CRUDE_ACCOUNT`), e.g. `crude-rezdy --account es booking cancellations --from 2026-05-03`. Without `--account`, the default account is used.
 
@@ -299,6 +299,19 @@ Facebook Page posts, insights, and comments over the Graph API. A bearer token i
     crude-facebook page get ; page insights [--metric ...] [--period day]
 
 Add `--json` to any read for the raw Graph object. Writes prompt unless `--yes`. Insight metric names shift between Graph versions (`impressions` is gone in favour of `views`, `page_fans` in favour of `page_follows`), so the insight commands take `--metric` to override the defaults. Constraints worth knowing: a Facebook post edit changes only the message and only on posts this app created, and the Page events edge is not reachable (Meta restricts it to Marketing Partners). On the venue's own Page the full surface runs without Meta App Review. Instagram is a separate product on Meta's roadmap and is not in this binary.
+
+## crude-mautic (self-hosted Mautic)
+
+Marketing automation: website forms and their submissions, contacts, segments, campaigns, and email send counts. `[mautic]` holds `base_url` (the instance, no `/api` suffix), `username` and `password`, sent as HTTP basic auth; there is no login step. Both the API and HTTP basic auth are switches under Configuration > API Settings in Mautic, off by default.
+
+    crude-mautic status                          # credential check + signed-in user
+    crude-mautic form list ; form get <id|alias> # `get` also lists the form's fields
+    crude-mautic form submissions <id|alias> [--where FIELD=VALUE] [--group-by FIELD] [--field F] [--limit N]
+    crude-mautic contact list [--search <q>] [--limit N] ; contact get <id>
+    crude-mautic segment list ; segment get <id> ; campaign list ; campaign get <id>
+    crude-mautic email list ; email get <id>     # list carries sent and read counts
+
+A form is addressed by numeric id or by the alias its page markup carries. One Mautic form commonly serves several website pages that mark their traffic with a hidden field, so counting a single page's submissions means filtering a shared form: `--where topic="Stallholder EOI"` narrows to that page's slice, and `--group-by topic` counts every slice at once. Answers are HTML-unescaped before matching, so a value stored two ways counts once. `--search` on contacts takes Mautic's own syntax (an email, or `segment:alias`). This client reads; it does not create or edit Mautic records.
 """
 
 
